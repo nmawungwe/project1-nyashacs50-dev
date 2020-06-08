@@ -6,6 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+print(os.environ['APP_SETTINGS'])
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -24,3 +26,6 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route("/")
 def index():
     return "Project 1: TODO"
+
+if __name__ == '__main__':
+    app.run()
