@@ -1,0 +1,8 @@
+CREATE TABLE accounts (
+	id serial PRIMARY KEY,
+  	username varchar(50) NOT NULL,
+  	password varchar(255) NOT NULL,
+  	email varchar(100) NOT NULL
+);
+
+INSERT INTO accounts (username, password, email) VALUES ('test', 'test', 'test@test.com');
