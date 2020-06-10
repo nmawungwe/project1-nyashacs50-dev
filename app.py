@@ -1,13 +1,13 @@
-import os
+import os, json
 
-from flask import Flask, session, request, jsonify, render_template, flash, redirect, url_for
+from flask import Blueprint, Flask, session, request, jsonify, render_template, flash, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_sqlalchemy import SQLAlchemy
 
 
-import requests
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -32,29 +32,44 @@ db = scoped_session(sessionmaker(bind=engine))
 # Intialize MySQL
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/login')
 def login():
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET','POST'])
+def signup_post():
+# User reached route via POST (as by submitting a form via POST)
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        error = None
-        users = db.execute("SELECT * FROM accounts WHERE username = :username",
-                            {"username": username})
-        user = users.fetchone()
-        if user is None:
-            error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
-            error = 'Incorrect password.'
-        if error is None:
-            # store the user id in a new session and return to the index
-            session.clear()
-            session['user_id'] = user['id']
-            return 'Logged in!'
-        flash(error)
-    return render_template('index.html') 
- 
+        # username = request.form.get('username')
+        password_hash = request.form.get(generate_password_hash('password'))
+            
+        user = db.execute("SELECT * FROM users WHERE username = :username",
+                            {"username":request.form.get("username")}).fetchone()
 
+        if user:
+            flash('Username already exists')
+            return render_template('signup.html')
+                
+        db.execute("INSERT INTO users (username, password) VALUES (:username, :password)",
+                                    {"username":request.form.get("username"), 
+                                    "password":password_hash})
+            # Commit changes to database
+        db.commit()
+        return redirect(url_for('login'))
+    else:
+        return render_template("signup.html")
 
+@app.route('/logout')
+def logout():
+    return 'Logout'
 
 if __name__ == '__main__':
     app.run()
