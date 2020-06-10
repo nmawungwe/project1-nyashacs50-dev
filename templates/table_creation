@@ -8,7 +8,7 @@ CREATE TABLE accounts (
 CREATE TABLE Users (
 	id serial PRIMARY KEY,
   	username varchar(50),
-  	password varchar(255)
+  	passwords varchar(255)
 );
 
 
