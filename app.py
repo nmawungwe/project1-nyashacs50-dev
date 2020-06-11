@@ -47,32 +47,38 @@ def login():
     # Forget any user_id
     session.clear()
 
-    username = request.form.get("username")
+    
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
+        username = request.form.get("username")
+
         # Ensure username was submitted
         if not request.form.get("username"):
-            return 'Enter username'
+            flash('Enter username')
+            return render_template('login.html')
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return 'Enter password'
+            flash('Enter password')
+            return render_template('login.html')
 
         # Query database for username (http://zetcode.com/db/sqlalchemy/rawsql/)
         # https://docs.sqlalchemy.org/en/latest/core/connections.html#sqlalchemy.engine.ResultProxy
-        result = db.execute("SELECT * FROM users WHERE username = :username",
+        user = db.execute("SELECT * FROM users WHERE username = :username",
                             {"username": username}).fetchone()
         
+        password = request.form.get("password")
 
         # Ensure username exists and password is correct
-        if result == None or not check_password_hash(result[2], request.form.get("password")):
-            return 'invalid username and/or password'
+        if user == None or not check_password_hash(user[2], password):
+            flash('invalid username and/or password')
+            return render_template('login.html')
 
         # Remember which user has logged in
-        session["user_id"] = result[0]
-        session["user_name"] = result[1]
+        session["user_id"] = user[0]
+        session["user_name"] = user[1]
 
         # Redirect user to home page
         return redirect(url_for('profile'))
