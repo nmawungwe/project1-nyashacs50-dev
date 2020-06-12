@@ -32,24 +32,23 @@ db = scoped_session(sessionmaker(bind=engine))
 # Intialize MySQL
 
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/profile')
 def profile():
+    if request.method == "GET":
+        if not session.get("logged_in"):
+            flash("You are not logged in")
+            return redirect(url_for('login'))
     return render_template('profile.html')
 
 @app.route('/login', methods=['GET','POST'])
 def login():
-    """ Log user in """
-
-    # Forget any user_id
-    session.clear()
-
-    
-
     # User reached route via POST (as by submitting a form via POST)
+    
     if request.method == "POST":
 
         username = request.form.get("username")
@@ -77,21 +76,24 @@ def login():
             return render_template('login.html')
 
         # Remember which user has logged in
+        session["logged_in"] = True
         session["user_id"] = user[0]
         session["user_name"] = user[1]
 
+
         # Redirect user to home page
-        return redirect(url_for('profile'))
+        return render_template('profile.html', name=session["user_name"])
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("login.html")
-
-    
-
- 
+        if session.get("logged_in"):
+                return render_template('profile.html', name=session["user_name"])
+        else:
+            return render_template("login.html")
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
+
+    
 # User reached route via POST (as by submitting a form via POST)
     if request.method == 'POST':
         # username = request.form.get('username')
@@ -113,11 +115,15 @@ def signup():
         db.commit()
         return redirect(url_for('login'))
     else:
-        return render_template("signup.html")
+        if session.get("logged_in"):
+            return render_template('profile.html', name=session["user_name"])
+        else: 
+            return render_template('signup.html')
 
 @app.route('/logout')
 def logout():
-    return 'Logout'
+    session.clear()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run()
