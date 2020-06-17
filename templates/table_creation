@@ -1,10 +1,6 @@
-CREATE TABLE accounts (
-	id serial PRIMARY KEY,
-  	username varchar(50) NOT NULL,
-  	password varchar(255) NOT NULL,
-  	email varchar(100) NOT NULL
-);
 
+
+https://www.w3schools.com/sql/sql_primarykey.asp
 CREATE TABLE Users (
 	id serial PRIMARY KEY,
   	username varchar(50),

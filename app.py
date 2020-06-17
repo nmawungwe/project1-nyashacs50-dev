@@ -7,14 +7,15 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 
-
+# https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 print(os.environ['APP_SETTINGS'])
 
+# https://flask.palletsprojects.com/en/1.1.x/quickstart/
 #app secret key
-app.secret_key = 'your secret key'
+app.secret_key = b'N\xb7\xcc\xfc[\xedgV\xcf\xe5y\xcf\xc41]a'
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -75,6 +76,7 @@ def login():
             flash('invalid username and/or password')
             return render_template('login.html')
 
+# https://github.com/baloo1379/cs50-project1/blob/master/app.py
         # Remember which user has logged in
         session["logged_in"] = True
         session["user_id"] = user[0]
@@ -92,9 +94,7 @@ def login():
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
-
-    
-# User reached route via POST (as by submitting a form via POST)
+    # User reached route via POST (as by submitting a form via POST)
     if request.method == 'POST':
         # username = request.form.get('username')
 
@@ -105,7 +105,7 @@ def signup():
         if user:
             flash('Username already exists')
             return render_template('signup.html')
-
+# https://books.google.co.za/books?id=VKRwAwAAQBAJ&pg=PA90&lpg=PA90&dq=werkzeug.security+check_password_hash&source=bl&ots=TPqgRYtN9k&sig=ACfU3U0TwKlOyOOBgtG2xSRvkHuL1hnAtg&hl=en&sa=X&ved=2ahUKEwi5h6Cm8vfpAhVJasAKHQG1Dn0Q6AEwB3oECAoQAQ#v=onepage&q=werkzeug.security%20check_password_hash&f=false
         password = request.form.get("password")
         password_hash = generate_password_hash(password, method='sha256', salt_length=8)       
         db.execute("INSERT INTO users (username, passwords) VALUES (:username, :password)",
@@ -124,6 +124,17 @@ def signup():
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+@app.route('/search', methods=['GET','POST'])
+def search():
+
+    return render_template('search_book.html')
+
+@app.route('/result', methods=['GET','POST'])
+def result():
+
+    return render_template('result.html')
+    
 
 if __name__ == '__main__':
     app.run()

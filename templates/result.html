@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="column is-4 is-offset-4">
+    <h3 class="title">Search book</h3>
+    <div class="box">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="notification is-danger">
+        {{ messages[0] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form class="rating" action="/result" method="post">
+            <h3>Results of Shoe Dog</h3>
+            <br>
+            <p>ISBN Number: 1632168146</p>
+            <p>Book Title: Shoe Dog</p>
+            <p>Book Author: Phil Knight</p>
+            <p>Publication Year: 2016</p>
+            <p>Previous reviews</p>
+            <ul>
+                <li>Book was great! (Nyasha)</li>
+                <li>Book was fantastic! (Tinashe)</li>
+                <li>One of the best! (Tatenda)</li>
+            </ul>
+            <p>Good reads average rating: 4.5</p>
+            <p>Good reads number of ratings: 178</p> 
+            <br>
+            <p>Review</p>
+            <br>
+            <label>
+                <span class="icon">1</span>
+                <input type="radio" name="stars" value="1" />
+              </label>
+
+              <label>
+                <span class="icon">2</span>
+                <input type="radio" name="stars" value="2" />
+              </label>
+
+              <label>
+                <span class="icon">3</span> 
+                <input type="radio" name="stars" value="3" />  
+              </label>
+
+              <label>
+                <span class="icon">4</span>
+                <input type="radio" name="stars" value="4" />
+              </label>
+
+              <label>
+                <span class="icon">5</span>
+                <input type="radio" name="stars" value="5" />
+              </label>
+
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="text" name="review" placeholder="Enter your review" autofocus="">
+                </div>
+            </div>  
+            <button class="button is-block is-info is-large is-fullwidth">Submit</button>  
+        </form>
+{% endblock %}
+
