@@ -7,6 +7,19 @@ CREATE TABLE Users (
   	passwords varchar(255)
 );
 
+INSERT INTO Users (username, password, email) VALUES ('test', 'test', 'test@test.com');
 
+https://www.postgresql.org/docs/9.1/plpgsql-declarations.html
+CREATE TABLE Book (
+	id serial PRIMARY KEY,
+  	isbn varchar(100) NOT NULL,
+	title varchar(100) NOT NULL,
+  	author varchar(100) NOT NULL,
+	publication_year integer NOT NULL
+);
 
-INSERT INTO accounts (username, password, email) VALUES ('test', 'test', 'test@test.com');
+INSERT INTO Book (isbn, title, author, publication_year) VALUES ( '9781471146725', 'Shoe Dog', 'Phil Knight',2016);
+
+INSERT INTO Book (isbn, title, author, publication_year) VALUES ( '9781471146750', 'The Testaments', 'Margaret Atwood',2019);
+
+INSERT INTO Book (isbn, title, author, publication_year) VALUES ( '9781471146765', 'Mat Dog', 'Phil Knight',2016);

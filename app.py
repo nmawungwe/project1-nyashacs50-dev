@@ -127,6 +127,24 @@ def logout():
 
 @app.route('/search', methods=['GET','POST'])
 def search():
+    if request.method == 'POST':
+
+        isbn = request.form.get("ISBN_number")
+        title = request.form.get("Book_title")
+        author = request.form.get("Book_author")
+
+        data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn OR title = :title OR author = :author ", {"isbn":isbn, "title":title, "author":author}) 
+        book = data.fetchone()
+        book_isbn = book[1]
+        book_title = book[2]
+        book_author = book[3]
+        
+        if len(book)== 0:
+            flash("Sorry book does't exist in database")
+            return render_template('search_book.html')
+        else:
+            return render_template('result.html', isbn = book_isbn, title=book_title, author=book_author)
+            
 
     return render_template('search_book.html')
 

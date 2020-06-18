@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="column is-4 is-offset-4">
-    <h3 class="title">Search book</h3>
+    <h3 class="title">Book</h3>
     <div class="box">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -13,13 +13,9 @@
         {% endwith %}
 
         <form class="rating" action="/result" method="post">
-            <h3>Results of Shoe Dog</h3>
-            <br>
-            <p>ISBN Number: 1632168146</p>
-            <p>Book Title: Shoe Dog</p>
-            <p>Book Author: Phil Knight</p>
-            <p>Publication Year: 2016</p>
-            <p>Previous reviews</p>
+            <p>Book isbn: {{ isbn }}</p>
+            <p>Book title: {{ title }}</p>
+            <p>Book author: {{ author }}</p>
             <ul>
                 <li>Book was great! (Nyasha)</li>
                 <li>Book was fantastic! (Tinashe)</li>
