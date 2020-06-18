@@ -134,16 +134,13 @@ def search():
         author = request.form.get("Book_author")
 
         data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn OR title = :title OR author = :author ", {"isbn":isbn, "title":title, "author":author}) 
-        book = data.fetchone()
-        book_isbn = book[1]
-        book_title = book[2]
-        book_author = book[3]
+        books = data.fetchall()
         
-        if len(book)== 0:
-            flash("Sorry book does't exist in database")
+        if len(books)== 0:
+            flash("Sorry no book were found")
             return render_template('search_book.html')
         else:
-            return render_template('result.html', isbn = book_isbn, title=book_title, author=book_author)
+            return render_template('result.html', books=books)
             
 
     return render_template('search_book.html')
@@ -152,7 +149,12 @@ def search():
 def result():
 
     return render_template('result.html')
-    
+
+@app.route('/book', methods=['GET','POST'])
+def book():
+
+    return render_template('book.html', book = book)
+
 
 if __name__ == '__main__':
     app.run()

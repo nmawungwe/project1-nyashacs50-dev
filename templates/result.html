@@ -13,9 +13,12 @@
         {% endwith %}
 
         <form class="rating" action="/result" method="post">
-            <p>Book isbn: {{ isbn }}</p>
-            <p>Book title: {{ title }}</p>
-            <p>Book author: {{ author }}</p>
+
+          <ul id="navigation">
+            {% for book in books %}
+                <li><a href="{{url_for('book')}}">{{ book.title }}</a></li>
+            {% endfor %}
+            </ul>
             <ul>
                 <li>Book was great! (Nyasha)</li>
                 <li>Book was fantastic! (Tinashe)</li>
