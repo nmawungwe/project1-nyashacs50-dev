@@ -1,6 +1,7 @@
 import os, json
 
 from flask import Blueprint, Flask, session, request, jsonify, render_template, flash, redirect, url_for
+import requests
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -33,10 +34,12 @@ db = scoped_session(sessionmaker(bind=engine))
 # Intialize MySQL
 
 
-
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if session.get("logged_in"):
+            return render_template('search_book.html', name=session["user_name"])
+    else: 
+        return render_template('login.html')
 
 @app.route('/profile')
 def profile():
@@ -84,11 +87,11 @@ def login():
 
 
         # Redirect user to home page
-        return render_template('profile.html', name=session["user_name"])
+        return render_template('search_book.html', name=session["user_name"])
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         if session.get("logged_in"):
-                return render_template('profile.html', name=session["user_name"])
+                return render_template('search_book.html', name=session["user_name"])
         else:
             return render_template("login.html")
 
@@ -129,31 +132,43 @@ def logout():
 def search():
     if request.method == 'POST':
 
-        isbn = request.form.get("ISBN_number")
-        title = request.form.get("Book_title")
-        author = request.form.get("Book_author")
+        query = request.form.get("q")
 
-        data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn OR title = :title OR author = :author ", {"isbn":isbn, "title":title, "author":author}) 
+        query = f"%{query}%".lower()
+        # https://www.techonthenet.com/sql/like.php
+        data = db.execute(" SELECT * FROM Books WHERE isbn LIKE :isbn OR title LIKE :title OR author LIKE :author ", {"isbn":query, "title":query, "author":query}) 
         books = data.fetchall()
         
         if len(books)== 0:
-            flash("Sorry no book were found")
+            flash("Sorry no book was found")
             return render_template('search_book.html')
         else:
             return render_template('result.html', books=books)
-            
-
     return render_template('search_book.html')
 
-@app.route('/result', methods=['GET','POST'])
-def result():
 
-    return render_template('result.html')
+@app.route('/book/<isbn>', methods=['GET'])
+def book(isbn):
+# getting book data from own database using isbn number
+    data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn", {"isbn":isbn}) 
+    
+    book = data.fetchone()
+# getting goodreads developer key 
+    key = os.getenv("GOODREADS_KEY")
+    query = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key":key , "isbns": isbn}) 
+    # checking if query is working
+    query = query.json()
+    
+    # https://www.newtonsoft.com/json/help/html/QueryJson.htm
+    book_1 = query["books"][0]
+    print(book_1)
 
-@app.route('/book', methods=['GET','POST'])
-def book():
+    # ensuring you get the 1st books in the return json         
+    query = query["books"][0]
 
-    return render_template('book.html', book = book)
+    
+    
+    return render_template('book.html', book=book, query=query)
 
 
 if __name__ == '__main__':

@@ -18,8 +18,12 @@ CREATE TABLE Book (
 	publication_year integer NOT NULL
 );
 
-INSERT INTO Book (isbn, title, author, publication_year) VALUES ( '9781471146725', 'Shoe Dog', 'Phil Knight',2016);
+SAVE ALL BOOK RECORDS IN small_caps
 
-INSERT INTO Book (isbn, title, author, publication_year) VALUES ( '9781471146750', 'The Testaments', 'Margaret Atwood',2019);
+INSERT INTO Books (isbn, title, author, publication_year) VALUES ( '0062315005', 'the alchemist', 'paulo coehlo',1988);
 
-INSERT INTO Book (isbn, title, author, publication_year) VALUES ( '9781471146765', 'Mat Dog', 'Phil Knight',2016);
+INSERT INTO Books (isbn, title, author, publication_year) VALUES ( '1101874082', 'adultery', 'paulo coehlo',2014);
+
+INSERT INTO Books (isbn, title, author, publication_year) VALUES ( '0385543786', 'the testaments', 'margaret atwood',2019);
+
+

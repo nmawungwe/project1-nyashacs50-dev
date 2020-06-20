@@ -2,9 +2,12 @@
 
 {% block content %}
 <h1 class="title">
-  {{book.title}}
+    <!-- https://exceptionshub.com/how-to-convert-string-to-uppercase-lowercase-in-jinja2.html  -->
+  {{book.title|upper}}
 </h1>
-<h2 class="subtitle">
-  Easy authentication and authorization in Flask.
-</h2>
+<p>ISBN: {{book.isbn}}</p>
+<p>Author: {{book.author}}</p>
+<p>Title: {{book.title}}</p>
+<p>Published: {{book.publication_year}}</p>
+<p>Average rating: {{query['average_rating']}}</p>
 {% endblock %}
