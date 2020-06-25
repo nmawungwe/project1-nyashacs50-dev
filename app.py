@@ -41,13 +41,13 @@ def index():
     else: 
         return render_template('login.html')
 
-@app.route('/profile')
-def profile():
-    if request.method == "GET":
-        if not session.get("logged_in"):
-            flash("You are not logged in")
-            return redirect(url_for('login'))
-    return render_template('profile.html')
+# @app.route('/profile')
+# def profile():
+#     if request.method == "GET":
+#         if not session.get("logged_in"):
+#             flash("You are not logged in")
+#             return redirect(url_for('login'))
+#     return render_template('profile.html')
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -197,7 +197,6 @@ def book(isbn):
         # https://www.newtonsoft.com/json/help/html/QueryJson.htm
         book_1 = query["books"][0]
         # print(book_1)
-
         # ensuring you get the 1st books in the return json         
         query = query["books"][0]
 
