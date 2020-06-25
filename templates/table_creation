@@ -1,7 +1,7 @@
 
 
 https://www.w3schools.com/sql/sql_primarykey.asp
-CREATE TABLE Users (
+CREATE TABLE users (
 	id serial PRIMARY KEY,
   	username varchar(50),
   	passwords varchar(255)
@@ -10,7 +10,7 @@ CREATE TABLE Users (
 INSERT INTO Users (username, password, email) VALUES ('test', 'test', 'test@test.com');
 
 https://www.postgresql.org/docs/9.1/plpgsql-declarations.html
-CREATE TABLE Book (
+CREATE TABLE books (
 	id serial PRIMARY KEY,
   	isbn varchar(100) NOT NULL,
 	title varchar(100) NOT NULL,
@@ -25,5 +25,14 @@ INSERT INTO Books (isbn, title, author, publication_year) VALUES ( '0062315005',
 INSERT INTO Books (isbn, title, author, publication_year) VALUES ( '1101874082', 'adultery', 'paulo coehlo',2014);
 
 INSERT INTO Books (isbn, title, author, publication_year) VALUES ( '0385543786', 'the testaments', 'margaret atwood',2019);
+
+creating reviews table which is related to users and books tables 
+  CREATE TABLE reviews (
+      id SERIAL PRIMARY KEY,
+      rating INTEGER NOT NULL,
+	  review varchar(250) NOT NULL,
+      book_id INTEGER REFERENCES books,
+	  user_id INTEGER REFERENCES users
+  );
 
 

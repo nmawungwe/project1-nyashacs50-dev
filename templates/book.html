@@ -9,5 +9,29 @@
 <p>Author: {{book.author}}</p>
 <p>Title: {{book.title}}</p>
 <p>Published: {{book.publication_year}}</p>
-<p>Average rating: {{query['average_rating']}}</p>
+<p>Goodreads Rating Count: {{query['work_ratings_count']}}</p>
+<p>Goodreads Average Rating: {{query['average_rating']}}</p>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="notification is-danger">
+{{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+<form method="POST">
+  <div class="field">
+      <div class="control">
+          <p>Rating(1-5):</p>
+          <input class="input is-large" type="number" name="rating" placeholder="Enter rating" autofocus="" min="0" max="5">
+      </div>
+  </div>
+
+  <div class="field">
+    <div class="control">
+        <p>Review</p>
+        <input class="input is-large" type="text" name="review" placeholder="Enter review" autofocus="">
+    </div>
+</div>
+<button class="button is-block is-info is-large is-fullwidth">Enter</button>
+</form>
 {% endblock %}

@@ -147,28 +147,64 @@ def search():
     return render_template('search_book.html')
 
 
-@app.route('/book/<isbn>', methods=['GET'])
+@app.route('/book/<isbn>', methods=['GET','POST'])
 def book(isbn):
+    if request.method == 'POST':
+        # Save current user info
+        currentUser = session["user_id"]
+        
+        # Fetch form data
+        rating = request.form.get("rating")
+        review = request.form.get("review")
+
+        print(isbn)
+         # Search book_id by ISBN
+        row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
+                        {"isbn": isbn})
+        bookId = row.fetchone() # (id,)
+        bookId=bookId[0]
+        
+        # Check for user submission (ONLY 1 review/user allowed per book)
+        row2 = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id",
+                    {"user_id": currentUser,
+                     "book_id": bookId})
+
+        # A review already exists
+        if row2.rowcount == 1:
+            print('This review alreadys exists')    
+            flash('You already submitted a review for this book', 'warning')
+            return redirect("/book/" + isbn)
+            
+        rating = int(rating)
+
+        db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)",{"user_id": currentUser, "book_id": bookId, "review": review, "rating": rating})
+        # Commit transactions to DB and close the connection
+        db.commit()
+        flash('Review submitted!', 'info')
+        return redirect("/book/" + isbn)
+    else:
+        data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn", {"isbn":isbn}) 
+    
+        book = data.fetchone()
+    # getting goodreads developer key 
+        key = os.getenv("GOODREADS_KEY")
+        query = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key":key , "isbns": isbn}) 
+        # checking if query is working
+        query = query.json()
+        
+        # https://www.newtonsoft.com/json/help/html/QueryJson.htm
+        book_1 = query["books"][0]
+        # print(book_1)
+
+        # ensuring you get the 1st books in the return json         
+        query = query["books"][0]
+
+        
+        
+        return render_template('book.html', book=book, query=query)
+          
 # getting book data from own database using isbn number
-    data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn", {"isbn":isbn}) 
     
-    book = data.fetchone()
-# getting goodreads developer key 
-    key = os.getenv("GOODREADS_KEY")
-    query = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key":key , "isbns": isbn}) 
-    # checking if query is working
-    query = query.json()
-    
-    # https://www.newtonsoft.com/json/help/html/QueryJson.htm
-    book_1 = query["books"][0]
-    print(book_1)
-
-    # ensuring you get the 1st books in the return json         
-    query = query["books"][0]
-
-    
-    
-    return render_template('book.html', book=book, query=query)
 
 
 if __name__ == '__main__':
