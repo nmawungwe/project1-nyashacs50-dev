@@ -181,6 +181,7 @@ def book(isbn):
         # Commit transactions to DB and close the connection
         db.commit()
         flash('Review submitted!')
+        # https://flask.palletsprojects.com/en/1.1.x/patterns/flashing/ redirects refuse so had to use render templates will look more into into
         return render_template('search_book.html')
     else:
  
@@ -200,7 +201,18 @@ def book(isbn):
         # ensuring you get the 1st books in the return json         
         query = query["books"][0]
 
-        return render_template('book.html', book=book, query=query)
+        # getting reviews need to look into this and understand it inner join etc
+        # intially check for book id using ISBN 
+        row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
+                        {"isbn": isbn}).fetchone()
+
+        book_r = row[0]
+        
+        results = db.execute("SELECT users.username, review, rating FROM users INNER JOIN reviews ON users.id = reviews.user_id WHERE book_id = :book", {"book": book_r})
+        
+        reviews =results.fetchall()
+
+        return render_template('book.html', book=book, query=query, reviews=reviews)
           
 # getting book data from own database using isbn number
     
