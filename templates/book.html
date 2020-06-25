@@ -11,13 +11,13 @@
 <p>Published: {{book.publication_year}}</p>
 <p>Goodreads Rating Count: {{query['work_ratings_count']}}</p>
 <p>Goodreads Average Rating: {{query['average_rating']}}</p>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="notification is-danger">
-{{ messages[0] }}
+<div>
+  {% if get_flashed_messages() %}
+        <div class="alert alert-info text-center" role="alert">
+            {{ get_flashed_messages() | join(" ") }}
+        </div>
+    {% endif %}
 </div>
-{% endif %}
-{% endwith %}
 <form method="POST">
   <div class="field">
       <div class="control">

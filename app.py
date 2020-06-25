@@ -157,7 +157,7 @@ def book(isbn):
         rating = request.form.get("rating")
         review = request.form.get("review")
 
-        print(isbn)
+        # print(isbn)
          # Search book_id by ISBN
         row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
                         {"isbn": isbn})
@@ -172,17 +172,18 @@ def book(isbn):
         # A review already exists
         if row2.rowcount == 1:
             print('This review alreadys exists')    
-            flash('You already submitted a review for this book', 'warning')
-            return redirect("/book/" + isbn)
+            flash('You already submitted a review for this book')
+            return render_template('search_book.html')
             
         rating = int(rating)
 
         db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)",{"user_id": currentUser, "book_id": bookId, "review": review, "rating": rating})
         # Commit transactions to DB and close the connection
         db.commit()
-        flash('Review submitted!', 'info')
-        return redirect("/book/" + isbn)
+        flash('Review submitted!')
+        return render_template('search_book.html')
     else:
+ 
         data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn", {"isbn":isbn}) 
     
         book = data.fetchone()
@@ -199,8 +200,6 @@ def book(isbn):
         # ensuring you get the 1st books in the return json         
         query = query["books"][0]
 
-        
-        
         return render_template('book.html', book=book, query=query)
           
 # getting book data from own database using isbn number
