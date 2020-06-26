@@ -12,6 +12,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
+
+# checking which developing configuration? 
 print(os.environ['APP_SETTINGS'])
 
 # https://flask.palletsprojects.com/en/1.1.x/quickstart/
@@ -206,16 +208,50 @@ def book(isbn):
                         {"isbn": isbn}).fetchone()
 
         book_r = row[0]
+
+        # ok, let me try and explain what I did here i initially created a reviews table for a certain book and it was referencing user_id and book_id as foreign keys, therefore to get reviews for a certain book I got the book isbn queried the books table to get its id, I then queried the users table for usernames using the foreign key functionnality and the reviews table for reviews and ratings given the book id     
         
         results = db.execute("SELECT users.username, review, rating FROM users INNER JOIN reviews ON users.id = reviews.user_id WHERE book_id = :book", {"book": book_r})
         
         reviews =results.fetchall()
 
         return render_template('book.html', book=book, query=query, reviews=reviews)
-          
-# getting book data from own database using isbn number
+
+@app.route("/api/<isbn>")
+def book_api(isbn):
+    """Return details about a single book."""
+    # {     "title": "Memory",     "author": "Doug loyd",     "year": 2015,     "isbn": "1632168146",     "review_count": 28,     "average_score": 5.0 } 
+
+    book_info = db.execute("SELECT * FROM books WHERE isbn = :isbn",{"isbn": isbn}).fetchone()
     
+    book_id =book_info[0]
+    # print(book_info)
 
+    # avg_rating = db.execute("SELECT AVG(rating) FROM reviews JOIN books ON books.id = reviews.book_id WHERE reviews.book_id = :book_id", {"book_id": book_id}).fetchall()
 
+    avg_rating = db.execute("SELECT AVG(rating) FROM reviews WHERE book_id = :book_id", {"book_id": book_id}).fetchone()
+
+    avg_rating = avg_rating[0]
+ 
+    # print(avg_rating)
+
+    
+    review_count = db.execute("SELECT COUNT(*) FROM reviews WHERE book_id = :book_id", {"book_id": book_id}).fetchone()
+
+    # print(review_count[0])
+
+    # return 'Api'
+    result = {
+                "title": book_info[2],
+                "author": book_info[3],
+                "year": book_info[4],
+                "isbn": book_info[1],
+                "review_count": review_count[0],
+                "average_score": float(avg_rating)
+            }   
+
+    return jsonify(result) 
+          
+    
 if __name__ == '__main__':
     app.run()
