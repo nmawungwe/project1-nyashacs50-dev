@@ -35,21 +35,13 @@ db = scoped_session(sessionmaker(bind=engine))
 
 # Intialize MySQL
 
-
+# session syntax https://pythonbasics.org/flask-sessions/
 @app.route('/')
 def index():
     if session.get("logged_in"):
             return render_template('search_book.html', name=session["user_name"])
     else: 
         return render_template('login.html')
-
-# @app.route('/profile')
-# def profile():
-#     if request.method == "GET":
-#         if not session.get("logged_in"):
-#             flash("You are not logged in")
-#             return redirect(url_for('login'))
-#     return render_template('profile.html')
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -132,97 +124,111 @@ def logout():
 
 @app.route('/search', methods=['GET','POST'])
 def search():
-    if request.method == 'POST':
+    if session.get("logged_in"):
 
-        query = request.form.get("q")
+        if request.method == 'POST':
 
-        query = f"%{query}%".lower()
-        # https://www.techonthenet.com/sql/like.php
-        data = db.execute(" SELECT * FROM Books WHERE isbn LIKE :isbn OR title LIKE :title OR author LIKE :author ", {"isbn":query, "title":query, "author":query}) 
-        books = data.fetchall()
-        
-        if len(books)== 0:
-            flash("Sorry no book was found")
-            return render_template('search_book.html')
-        else:
-            return render_template('result.html', books=books)
-    return render_template('search_book.html')
+            query = request.form.get("q")
+
+            query = f"%{query}%".lower()
+            # https://www.techonthenet.com/sql/like.php
+            data = db.execute(" SELECT * FROM Books WHERE isbn LIKE :isbn OR title LIKE :title OR author LIKE :author ", {"isbn":query, "title":query, "author":query}) 
+            books = data.fetchall()
+            
+            if len(books)== 0:
+                flash("Sorry no book was found")
+                return render_template('search_book.html')
+            else:
+                return render_template('result.html', books=books)
+        return render_template('search_book.html')
+    else:
+        return render_template('login.html')
 
 
 @app.route('/book/<isbn>', methods=['GET','POST'])
 def book(isbn):
-    if request.method == 'POST':
-        # Save current user info
-        currentUser = session["user_id"]
-        
-        # Fetch form data
-        rating = request.form.get("rating")
-        review = request.form.get("review")
-
-        # print(isbn)
-         # Search book_id by ISBN
-        row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
-                        {"isbn": isbn})
-        bookId = row.fetchone() # (id,)
-        bookId=bookId[0]
-        
-        # Check for user submission (ONLY 1 review/user allowed per book)
-        row2 = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id",
-                    {"user_id": currentUser,
-                     "book_id": bookId})
-
-        # A review already exists
-        if row2.rowcount == 1:
-            print('This review alreadys exists')    
-            flash('You already submitted a review for this book')
-            return render_template('search_book.html')
+    if session.get("logged_in"):
+        if request.method == 'POST':
+            # Save current user info
+            currentUser = session["user_id"]
             
-        rating = int(rating)
+            # Fetch form data
+            rating = request.form.get("rating")
+            review = request.form.get("review")
 
-        db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)",{"user_id": currentUser, "book_id": bookId, "review": review, "rating": rating})
-        # Commit transactions to DB and close the connection
-        db.commit()
-        flash('Review submitted!')
-        # https://flask.palletsprojects.com/en/1.1.x/patterns/flashing/ redirects refuse so had to use render templates will look more into into
-        return render_template('search_book.html')
-    else:
- 
-        data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn", {"isbn":isbn}) 
+            # print(isbn)
+            # Search book_id by ISBN
+            row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
+                            {"isbn": isbn})
+            bookId = row.fetchone() # (id,)
+            bookId=bookId[0]
+            
+            # Check for user submission (ONLY 1 review/user allowed per book)
+            row2 = db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id",
+                        {"user_id": currentUser,
+                        "book_id": bookId})
+
+            # A review already exists
+            if row2.rowcount == 1:
+                print('This review alreadys exists')    
+                flash('You already submitted a review for this book')
+                return render_template('search_book.html')
+                
+            rating = int(rating)
+
+            db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)",{"user_id": currentUser, "book_id": bookId, "review": review, "rating": rating})
+            # Commit transactions to DB and close the connection
+            db.commit()
+            flash('Review submitted!')
+            # https://flask.palletsprojects.com/en/1.1.x/patterns/flashing/ redirects refuse so had to use render templates will look more into into
+            return render_template('search_book.html')
+        else:
     
-        book = data.fetchone()
-    # getting goodreads developer key 
-        key = os.getenv("GOODREADS_KEY")
-        query = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key":key , "isbns": isbn}) 
-        # checking if query is working
-        query = query.json()
+            data = db.execute(" SELECT * FROM Books WHERE isbn = :isbn", {"isbn":isbn}) 
         
-        # https://www.newtonsoft.com/json/help/html/QueryJson.htm
-        book_1 = query["books"][0]
-        # print(book_1)
-        # ensuring you get the 1st books in the return json         
-        query = query["books"][0]
+            book = data.fetchone()
+        # getting goodreads developer key 
+            key = os.getenv("GOODREADS_KEY")
+            query = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key":key , "isbns": isbn}) 
+            # checking if query is working
+            query = query.json()
+            
+            # https://www.newtonsoft.com/json/help/html/QueryJson.htm
+            book_1 = query["books"][0]
+            # print(book_1)
+            # ensuring you get the 1st books in the return json         
+            query = query["books"][0]
 
-        # getting reviews need to look into this and understand it inner join etc
-        # intially check for book id using ISBN 
-        row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
-                        {"isbn": isbn}).fetchone()
+            # getting reviews need to look into this and understand it inner join etc
+            # intially check for book id using ISBN 
+            row = db.execute("SELECT id FROM books WHERE isbn = :isbn",
+                            {"isbn": isbn}).fetchone()
 
-        book_r = row[0]
+            book_r = row[0]
 
-        # ok, let me try and explain what I did here i initially created a reviews table for a certain book and it was referencing user_id and book_id as foreign keys, therefore to get reviews for a certain book I got the book isbn queried the books table to get its id, I then queried the users table for usernames using the foreign key functionnality and the reviews table for reviews and ratings given the book id     
-        
-        results = db.execute("SELECT users.username, review, rating FROM users INNER JOIN reviews ON users.id = reviews.user_id WHERE book_id = :book", {"book": book_r})
-        
-        reviews =results.fetchall()
+            # ok, let me try and explain what I did here i initially created a reviews table for a certain book and it was referencing user_id and book_id as foreign keys, therefore to get reviews for a certain book I got the book isbn queried the books table to get its id, I then queried the users table for usernames using the foreign key functionnality and the reviews table for reviews and ratings given the book id     
+            
+            results = db.execute("SELECT users.username, review, rating FROM users INNER JOIN reviews ON users.id = reviews.user_id WHERE book_id = :book", {"book": book_r})
+            
+            reviews =results.fetchall()
 
-        return render_template('book.html', book=book, query=query, reviews=reviews)
+            return render_template('book.html', book=book, query=query, reviews=reviews)
+    else:
+        return render_template('login.html')
 
 @app.route("/api/<isbn>")
 def book_api(isbn):
+    
     """Return details about a single book."""
     # {     "title": "Memory",     "author": "Doug loyd",     "year": 2015,     "isbn": "1632168146",     "review_count": 28,     "average_score": 5.0 } 
 
     book_info = db.execute("SELECT * FROM books WHERE isbn = :isbn",{"isbn": isbn}).fetchone()
+
+    if book_info is None:
+        return jsonify({
+            "error":"Invalid book isbn "
+        }), 404
+
     
     book_id =book_info[0]
     # print(book_info)
@@ -231,7 +237,8 @@ def book_api(isbn):
 
     avg_rating = db.execute("SELECT AVG(rating) FROM reviews WHERE book_id = :book_id", {"book_id": book_id}).fetchone()
 
-    avg_rating = avg_rating[0]
+    # have to convert into float format because unable to jsonify decimal format
+    avg_rating = float(avg_rating[0])
  
     # print(avg_rating)
 
@@ -245,9 +252,9 @@ def book_api(isbn):
                 "title": book_info[2],
                 "author": book_info[3],
                 "year": book_info[4],
-                "isbn": book_info[1],
+                "isbn": int(book_info[1]),
                 "review_count": review_count[0],
-                "average_score": float(avg_rating)
+                "average_score": avg_rating
             }   
 
     return jsonify(result) 
