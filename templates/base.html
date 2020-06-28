@@ -13,11 +13,9 @@
 <body>
     <!-- https://dev.to/brunooliveira/flask-series-part-9-adding-a-navbar-by-using-template-inheritance-2e5o to discern what shows on navigation bar before and after login -->
     <section class="hero is-primary is-fullheight">
-
         <div class="hero-head">
             <nav class="navbar">
                 <div class="container">
-
                     <div id="navbarMenuHeroA" class="navbar-menu">
                         <div class="navbar-end">
                             {% if  session.logged_in %}
@@ -44,8 +42,8 @@
 
         <div class="hero-body">
             <div class="container has-text-centered">
-               {% block content %}
-               {% endblock %}
+                {% block content %}
+                {% endblock %}
             </div>
         </div>
     </section>

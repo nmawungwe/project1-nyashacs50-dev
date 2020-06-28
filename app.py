@@ -53,12 +53,12 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            flash('Enter username')
+            flash('Enter username','warning')
             return render_template('login.html')
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            flash('Enter password')
+            flash('Enter password','warning')
             return render_template('login.html')
 
         # Query database for username (http://zetcode.com/db/sqlalchemy/rawsql/)
@@ -70,7 +70,7 @@ def login():
 
         # Ensure username exists and password is correct
         if user == None or not check_password_hash(user[2], password):
-            flash('invalid username and/or password')
+            flash('invalid username and/or password','danger')
             return render_template('login.html')
 
 # https://github.com/baloo1379/cs50-project1/blob/master/app.py
@@ -100,7 +100,7 @@ def signup():
                             {"username":request.form.get("username")}).fetchone()
 
         if user:
-            flash('Username already exists')
+            flash('Username already exists','danger')
             return render_template('signup.html')
 # https://books.google.co.za/books?id=VKRwAwAAQBAJ&pg=PA90&lpg=PA90&dq=werkzeug.security+check_password_hash&source=bl&ots=TPqgRYtN9k&sig=ACfU3U0TwKlOyOOBgtG2xSRvkHuL1hnAtg&hl=en&sa=X&ved=2ahUKEwi5h6Cm8vfpAhVJasAKHQG1Dn0Q6AEwB3oECAoQAQ#v=onepage&q=werkzeug.security%20check_password_hash&f=false
         password = request.form.get("password")
@@ -136,7 +136,7 @@ def search():
             books = data.fetchall()
             
             if len(books)== 0:
-                flash("Sorry no book was found")
+                flash("Sorry no book was found","danger")
                 return render_template('search_book.html')
             else:
                 return render_template('result.html', books=books)
@@ -171,7 +171,7 @@ def book(isbn):
             # A review already exists
             if row2.rowcount == 1:
                 print('This review alreadys exists')    
-                flash('You already submitted a review for this book')
+                flash('You already submitted a review for this book','warning')
                 return render_template('search_book.html')
                 
             rating = int(rating)
@@ -179,7 +179,7 @@ def book(isbn):
             db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)",{"user_id": currentUser, "book_id": bookId, "review": review, "rating": rating})
             # Commit transactions to DB and close the connection
             db.commit()
-            flash('Review submitted!')
+            flash('Review submitted!','success')
             # https://flask.palletsprojects.com/en/1.1.x/patterns/flashing/ redirects refuse so had to use render templates will look more into into
             return render_template('search_book.html')
         else:
