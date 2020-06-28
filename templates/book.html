@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
-    <!-- https://exceptionshub.com/how-to-convert-string-to-uppercase-lowercase-in-jinja2.html  -->
-  {{book.title|upper}}
+<div class="container">
+<h1 class="text-capitalize">
+<!-- https://exceptionshub.com/how-to-convert-string-to-uppercase-lowercase-in-jinja2.html  -->
+  {{book.title}}
 </h1>
 <p>ISBN: {{book.isbn}}</p>
 <p>Author: {{book.author}}</p>
@@ -28,16 +29,17 @@
   <div class="field">
       <div class="control">
           <p>Rating(1-5):</p>
-          <input class="input is-large" type="number" name="rating" placeholder="Enter rating" autofocus="" min="0" max="5">
+          <input class="form-control col-6" type="number" name="rating" placeholder="Enter rating" autofocus="" min="0" max="5">
       </div>
   </div>
 
   <div class="field">
     <div class="control">
         <p>Review</p>
-        <input class="input is-large" type="text" name="review" placeholder="Enter review" autofocus="">
+        <textarea class="input is-large form-control" type="text" name="review" placeholder="Enter review" rows="3"></textarea>
     </div>
 </div>
-<button class="button is-block is-info is-large is-fullwidth">Enter</button>
+<button class="button is-block is-info is-large">Enter</button>
 </form>
+</div>
 {% endblock %}

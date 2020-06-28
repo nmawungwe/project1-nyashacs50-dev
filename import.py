@@ -24,7 +24,7 @@ f = open("books.csv")
 reader = csv.reader(f)
 for isbn, title, author, year in reader:
       db.execute("INSERT INTO Books (isbn, title, author, publication_year) VALUES (:isbn, :title, :author, :publication_year)",
-                  {"isbn": isbn, "title":title , "author":author, "publication_year":year}) # substitute values from CSV line into SQL command, as per this dict
+                  {"isbn": isbn, "title":title.lower() , "author":author.lower(), "publication_year":year}) # substitute values from CSV line into SQL command, as per this dict
       print(f"Added book: isbn:{isbn} title:{title} author:{author} publication_year:{year}")
       
       db.commit() 

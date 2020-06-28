@@ -11,14 +11,20 @@
         </div>
         {% endif %}
         {% endwith %}
-
-        <form class="rating" action="/result" method="post">
-
-          <ul id="navigation">
+            
             {% for book in books %}
-              <a href="/book/{{book['isbn']}}" class="card-link"><b>Title: {{book.title|upper}}</b></a><br>
+            <div class="list-group row">
+              <div class="col">
+              <a href="/book/{{book['isbn']}}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                  <h5 class="mb-1 text-center text-capitalize" >Title: {{book.title}}</h5>
+                </div> 
+                <p class="mb-1 text-center text-capitalize">Author: {{book.author}}</p>
+              </a>
+            </div>
+            </div>
             {% endfor %}
-            </ul>
-        </form>
+            
+
 {% endblock %}
 
