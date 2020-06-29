@@ -99,6 +99,7 @@ def signup():
         user = db.execute("SELECT * FROM users WHERE username = :username",
                             {"username":request.form.get("username")}).fetchone()
 
+
         if user:
             flash('Username already exists','danger')
             return render_template('signup.html')

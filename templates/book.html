@@ -2,40 +2,52 @@
 
 {% block content %}
 <div class="container">
-<h1 class="text-capitalize">
-<!-- https://exceptionshub.com/how-to-convert-string-to-uppercase-lowercase-in-jinja2.html  -->
-  {{book.title}}
-</h1>
-<p>ISBN: {{book.isbn}}</p>
-<p>Author: {{book.author}}</p>
-<p>Title: {{book.title}}</p>
-<p>Published: {{book.publication_year}}</p>
-<p>Goodreads Rating Count: {{query['work_ratings_count']}}</p>
-<p>Goodreads Average Rating: {{query['average_rating']}}</p>
-<p>Site Reviews</p>
-{% for review in reviews %}
-    <p>Username: {{ review.username }}</p>
-    <p>Review: {{review.review}}</p>
-    <p>Rating: {{review.rating}}</p>
-{% endfor %}
-<div>
-  {% if get_flashed_messages() %}
-        <div class="alert alert-info text-center" role="alert">
-            {{ get_flashed_messages() | join(" ") }}
+<div class="text-secondary bg-light rounded">
+    <h1 class="text-capitalize">
+        <!-- https://exceptionshub.com/how-to-convert-string-to-uppercase-lowercase-in-jinja2.html  -->
+          {{book.title}}
+        </h1>
+        <div class="list-group list-group-item list-group-item-action flex-column align-items-start d-flex w-100 justify-content-between">
+        <p>ISBN: {{book.isbn}}</p>
+        <p class="text-capitalize">Author: {{book.author}}</p>
+        <p class="text-capitalize">Title: {{book.title}}</p>
+        <p>Published: {{book.publication_year}}</p>
+        <p>Goodreads Rating Count: {{query['work_ratings_count']}}</p>
+        <p>Goodreads Average Rating: {{query['average_rating']}}</p>
         </div>
-    {% endif %}
 </div>
+<br>
+<div class="text-secondary bg-light w-50 p-3 rounded mx-auto">
+    <div>
+    <h4 class="text-capitalize">User Reviews</h4>
+    <div class="list-group list-group-item list-group-item-action flex-column align-items-start d-flex w-100 justify-content-between">
+    {% for review in reviews %}
+        <h5 class="mb-1 text-capitalize">User: {{ review.username }}</h5>
+        <p class="mb-1">Review: {{review.review}}</p>
+        <p class="mb-1">Rating: {{review.rating}}</p>
+    {% endfor %}
+    </div>
+    <div>
+      {% if get_flashed_messages() %}
+            <div class="alert alert-info text-center" role="alert">
+                {{ get_flashed_messages() | join(" ") }}
+            </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+<br>
 <form method="POST">
   <div class="field">
       <div class="control">
-          <p>Rating(1-5):</p>
+          <b><p>Rating(1-5):</p></b>
           <input class="form-control col-6" type="number" name="rating" placeholder="Enter rating" autofocus="" min="0" max="5" required>
       </div>
   </div>
 
   <div class="field">
     <div class="control">
-        <p>Review</p>
+        <b><p>Review</p></b>
         <textarea class="input is-large form-control" type="text" name="review" placeholder="Enter review" rows="3" required></textarea>
     </div>
 </div>
