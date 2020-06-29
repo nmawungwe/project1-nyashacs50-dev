@@ -1,3 +1,4 @@
+# https://realpython.com/flask-by-example-part-1-project-setup/
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -6,7 +7,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    SECRET_KEY = 'this-really-needs-to-be-changed'
+    SECRET_KEY = b'N\xb7\xcc\xfc[\xedgV\xcf\xe5y\xcf\xc41]a'
 
 
 class ProductionConfig(Config):
